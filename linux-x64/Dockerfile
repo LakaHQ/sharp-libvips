@@ -23,8 +23,10 @@ RUN \
     gperf \
     jq \
     nasm \
+    numactl-devel \
     rh-python38 \
     && \
+  yum install -y https://www.nasm.us/pub/nasm/releasebuilds/2.13.01/linux/nasm-2.13.01-0.fc24.x86_64.rpm && \
   curl https://sh.rustup.rs -sSf | sh -s -- -y \
     --no-modify-path \
     --profile minimal \

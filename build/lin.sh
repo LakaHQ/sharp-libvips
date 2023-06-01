@@ -78,7 +78,7 @@ export CARGO_PROFILE_RELEASE_INCREMENTAL=false
 export CARGO_PROFILE_RELEASE_LTO=true
 export CARGO_PROFILE_RELEASE_OPT_LEVEL=z
 export CARGO_PROFILE_RELEASE_PANIC=abort
-
+export CARGO_REGISTRIES_CRATES_IO_PROTOCOL=sparse
 # Ensure Cargo build path prefixes are removed from the resulting binaries
 # https://reproducible-builds.org/docs/build-path/
 export RUSTFLAGS+=" --remap-path-prefix=$CARGO_HOME/registry/="
@@ -117,6 +117,7 @@ VERSION_RSVG=2.56.1
 VERSION_AOM=3.6.1
 VERSION_HEIF=1.16.2
 VERSION_CGIF=0.3.2
+VERSION_DE265=1.0.11
 
 # Remove patch version component
 without_patch() {
@@ -259,13 +260,32 @@ AOM_AS_FLAGS="${FLAGS}" cmake -G"Unix Makefiles" \
   ..
 make install/strip
 
+
+mkdir ${DEPS}/libde265
+$CURL https://github.com/strukturag/libde265/releases/download/v${VERSION_DE265}/libde265-${VERSION_DE265}.tar.gz | tar xzC ${DEPS}/libde265 --strip-components=1
+cd ${DEPS}/libde265
+mkdir build
+cd build
+cmake -G"Unix Makefiles" .. -DCMAKE_INSTALL_PREFIX=${TARGET} -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_BUILD_TYPE=Release
+make install/strip
+
+
+git clone https://bitbucket.org/multicoreware/x265_git.git ${DEPS}/x265
+cd ${DEPS}/x265/build/linux
+./multilib.sh
+#cmake -G"Unix Makefiles" ../../source -DCMAKE_INSTALL_PREFIX=${TARGET} -DCMAKE_INSTALL_LIBDIR=lib -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DMAIN12=ON -DCMAKE_BUILD_TYPE=Release
+#make install/strip
+cp 8bit/libx265.a ${TARGET}/lib/libx265.a
+
+
 mkdir ${DEPS}/heif
 $CURL https://github.com/strukturag/libheif/releases/download/v${VERSION_HEIF}/libheif-${VERSION_HEIF}.tar.gz | tar xzC ${DEPS}/heif --strip-components=1
 cd ${DEPS}/heif
 CFLAGS="${CFLAGS} -O3" CXXFLAGS="${CXXFLAGS} -O3" cmake -G"Unix Makefiles" \
   -DCMAKE_TOOLCHAIN_FILE=${ROOT}/Toolchain.cmake -DCMAKE_INSTALL_PREFIX=${TARGET} -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_BUILD_TYPE=Release \
-  -DBUILD_SHARED_LIBS=FALSE -DENABLE_PLUGIN_LOADING=0 -DWITH_EXAMPLES=0 -DWITH_LIBDE265=0 -DWITH_X265=0
+  -DBUILD_SHARED_LIBS=FALSE -DENABLE_PLUGIN_LOADING=0 -DWITH_EXAMPLES=0 -DWITH_LIBDE265=1 -DWITH_X265=1
 make install/strip
+
 
 mkdir ${DEPS}/jpeg
 $CURL https://github.com/mozilla/mozjpeg/archive/v${VERSION_MOZJPEG}.tar.gz | tar xzC ${DEPS}/jpeg --strip-components=1
