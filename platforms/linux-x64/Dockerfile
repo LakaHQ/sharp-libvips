@@ -44,7 +44,7 @@ RUN \
   ln -s /usr/bin/gcc10-strip /usr/bin/strip && \
   ln -s /usr/bin/gcc10-ranlib /usr/bin/ranlib && \
   ln -s /usr/bin/gcc10-readelf /usr/bin/readelf && \
-  yum install -y https://www.nasm.us/pub/nasm/releasebuilds/2.13.01/linux/nasm-2.13.01-0.fc24.x86_64.rpm && \
+
   curl https://sh.rustup.rs -sSf | sh -s -- -y \
     --no-modify-path \
     --profile minimal \
