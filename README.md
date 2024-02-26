@@ -3,13 +3,8 @@
 libvips and its dependencies are provided as pre-compiled shared libraries
 for the most common operating systems and CPU architectures.
 
-During `npm install`, these binaries are fetched as tarballs from
-this repository via HTTPS and stored locally within `node_modules/sharp/vendor`.
-
-The base URL can be overridden using the
-`npm_config_sharp_libvips_binary_host` environment variable.
-
-https://sharp.pixelplumbing.com/install#custom-prebuilt-binaries
+These are [packaged](npm) and published to the npm registry under the
+[@img](https://www.npmjs.com/org/img) organisation.
 
 ## Creating a tarball
 
@@ -22,17 +17,18 @@ Run the top-level [build script](build.sh) without parameters for help.
 One [build script](build/lin.sh) is used to (cross-)compile
 the same shared libraries within multiple containers.
 
-* [x64 glibc](linux-x64/Dockerfile)
-* [x64 musl](linuxmusl-x64/Dockerfile)
-* [ARMv6 glibc](linux-armv6/Dockerfile)
-* [ARMv7-A glibc](linux-armv7/Dockerfile)
-* [ARM64v8-A glibc](linux-arm64v8/Dockerfile)
-* [ARM64v8-A musl](linuxmusl-arm64v8/Dockerfile)
+* [x64 glibc](platforms/linux-x64/Dockerfile)
+* [x64 musl](platforms/linuxmusl-x64/Dockerfile)
+* [ARMv6 glibc](platforms/linux-armv6/Dockerfile)
+* [ARMv7-A glibc](platforms/linux-armv7/Dockerfile)
+* [ARM64v8-A glibc](platforms/linux-arm64v8/Dockerfile)
+* [ARM64v8-A musl](platforms/linuxmusl-arm64v8/Dockerfile)
+* [s390x glibc](platforms/linux-s390x/Dockerfile)
 
 ### Windows
 
 The output of libvips' [build-win64-mxe](https://github.com/libvips/build-win64-mxe)
-static "web" releases are [post-processed](build/win.sh) within a [container](win32/Dockerfile).
+static "web" releases are [post-processed](build/win.sh) within a [container](platforms/win32/Dockerfile).
 
 ### macOS
 
@@ -43,6 +39,13 @@ The dylib files are compiled within the same build script as Linux.
 * ARM64 (cross-compiled)
 
 Dependency paths are modified to use the relative `@rpath` with `install_name_tool`.
+
+### WebAssembly
+
+The scripts from [wasm-vips](https://github.com/kleisauke/wasm-vips)
+are [used to compile](build/wasm.sh) libvips and its dependencies
+as static Wasm libraries ready for further compilation into a single,
+statically-linked sharp shared library.
 
 ## Licences
 

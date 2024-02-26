@@ -44,17 +44,9 @@ tar czf /packaging/libvips-${VERSION_VIPS}-${PLATFORM}.tar.gz \
   include \
   lib/glib-2.0 \
   lib/libvips.lib \
-  lib/libglib-2.0.lib \
-  lib/libgobject-2.0.lib \
   lib/*.dll \
   *.json \
   THIRD-PARTY-NOTICES.md
-
-# Recompress using AdvanceCOMP, ~5% smaller
-advdef --recompress --shrink-insane /packaging/libvips-${VERSION_VIPS}-${PLATFORM}.tar.gz
-
-# Recompress using Brotli, ~15% smaller
-gunzip -c /packaging/libvips-${VERSION_VIPS}-${PLATFORM}.tar.gz | brotli -o /packaging/libvips-${VERSION_VIPS}-${PLATFORM}.tar.br
 
 # Allow tarballs to be read outside container
 chmod 644 /packaging/libvips-${VERSION_VIPS}-${PLATFORM}.tar.*
