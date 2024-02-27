@@ -21,8 +21,8 @@ darwin*)
 	;;
 esac
 
-mkdir ${DEPS}
-mkdir ${TARGET}
+mkdir -p ${DEPS}
+mkdir -p ${TARGET}
 
 # Default optimisation level is for binary size (-Os)
 # Overriden to performance (-O3) for select dependencies that benefit
@@ -201,7 +201,6 @@ if [ "${PLATFORM%-*}" == "linuxmusl" ] || [ "$DARWIN" = true ]; then
 	meson setup _build --default-library=static --buildtype=release --strip --prefix=${TARGET} ${MESON}
 	meson install -C _build --tag devel
 fi
-
 mkdir ${DEPS}/zlib-ng
 $CURL https://github.com/zlib-ng/zlib-ng/archive/${VERSION_ZLIB_NG}.tar.gz | tar xzC ${DEPS}/zlib-ng --strip-components=1
 cd ${DEPS}/zlib-ng
@@ -268,9 +267,7 @@ make install/strip
 mkdir ${DEPS}/libde265
 $CURL https://github.com/strukturag/libde265/releases/download/v${VERSION_DE265}/libde265-${VERSION_DE265}.tar.gz | tar xzC ${DEPS}/libde265 --strip-components=1
 cd ${DEPS}/libde265
-mkdir build
-cd build
-cmake -G"Unix Makefiles" .. -DCMAKE_INSTALL_PREFIX=${TARGET} -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_BUILD_TYPE=Release ${DARWIN_ARM:+-DDISABLE_SSE=YES}
+cmake -G"Unix Makefiles" . -DBUILD_SHARED_LIBS=FALSE -DCMAKE_INSTALL_PREFIX=${TARGET} -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_BUILD_TYPE=Release
 make install/strip
 
 git clone https://bitbucket.org/multicoreware/x265_git.git ${DEPS}/x265
@@ -279,6 +276,9 @@ cd ${DEPS}/x265/build/linux
 #cmake -G"Unix Makefiles" ../../source -DCMAKE_INSTALL_PREFIX=${TARGET} -DCMAKE_INSTALL_LIBDIR=lib -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DMAIN12=ON -DCMAKE_BUILD_TYPE=Release
 #make install/strip
 cp 8bit/libx265.a ${TARGET}/lib/libx265.a
+cp 8bit/x265.pc ${TARGET}/lib/pkgconfig/x265.pc
+cp ../../source/x265.h ${TARGET}/include/x265.h
+cp 8bit/x265_config.h ${TARGET}/include/x265_config.h
 
 mkdir ${DEPS}/heif
 $CURL https://github.com/strukturag/libheif/releases/download/v${VERSION_HEIF}/libheif-${VERSION_HEIF}.tar.gz | tar xzC ${DEPS}/heif --strip-components=1
