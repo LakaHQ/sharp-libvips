@@ -22,7 +22,8 @@ if [ $# -lt 1 ]; then
   echo "- linux-riscv64"
 	echo "- linux-s390x"
 	echo "- darwin-x64"
-	echo "- darwin-arm64v8"echo "- dev-wasm32"
+	echo "- darwin-arm64v8"
+	echo "- dev-wasm32"
 	echo
 	exit 1
 fi
@@ -92,7 +93,7 @@ done
 for flavour in linux-x64 linuxmusl-x64 linux-armv6 linux-arm64v8 linuxmusl-arm64v8 linux-ppc64le linux-riscv64 linux-s390x; do
 	if [ $PLATFORM = "all" ] || [ $PLATFORM = $flavour ]; then
 		echo "Building $flavour..."
-		docker build --pull -t vips-dev-$flavour platforms/$flavour
+		docker build --platform linux/amd64  --pull -t vips-dev-$flavour platforms/$flavour
 		docker run --rm -v $PWD:/packaging vips-dev-$flavour sh -c "/packaging/build/posix.sh"
 	fi
 done
