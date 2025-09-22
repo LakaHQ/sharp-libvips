@@ -1,23 +1,31 @@
 #!/usr/bin/env bash
 set -e
 
-LIBVIPS_VERSION=$(cat LIBVIPS_VERSION)
-CURL="curl --silent --location"
+# Dependency version numbers
+source ./versions.properties
 
-download_extract() {
+# Common options for curl
+CURL="curl --silent --location --retry 3 --retry-max-time 30"
+
+extract() {
   PLATFORM="$1"
-  PACKAGE="${1%v[68]}" # remove ARM version
+  case $1 in
+    *ppc64le)
+      PACKAGE="${1%??}" # package directory is named as npm/linux-ppc64
+      ;;
+    *)
+      PACKAGE="${1%v[68]}" # remove ARM version
+      ;;
+  esac
   echo "$PLATFORM -> $PACKAGE"
   rm -rf "npm/$PACKAGE/include" "npm/$PACKAGE/lib"
-  $CURL \
-    "https://github.com/lovell/sharp-libvips/releases/download/v$LIBVIPS_VERSION/libvips-$LIBVIPS_VERSION-$PLATFORM.tar.gz" | \
-    tar xzC "npm/$PACKAGE" --exclude="platform.json"
+  tar xzf sharp-libvips-$PLATFORM.tar.gz -C "npm/$PACKAGE"
 }
 
 download_cpp() {
   $CURL \
     --remote-name --output-dir "npm/dev/cplusplus" --create-dirs \
-    "https://raw.githubusercontent.com/libvips/libvips/v$LIBVIPS_VERSION/cplusplus/$1.cpp"
+    "https://raw.githubusercontent.com/libvips/libvips/v$VERSION_VIPS/cplusplus/$1.cpp"
 }
 
 generate_readme() {
@@ -45,15 +53,18 @@ remove_unused() {
 }
 
 # Download and extract per-platform binaries
-PLATFORMS=$(ls platforms --ignore=*armv7 --ignore=win32*)
+PLATFORMS=$(ls platforms --ignore=win32*)
 for platform in $PLATFORMS; do
-  download_extract "$platform"
+  extract "$platform"
 done
-download_extract "win32-ia32"
-download_extract "win32-x64"
+for platform in arm64v8 ia32 x64; do
+  extract "win32-$platform"
+done
+extract "dev-wasm32"
 
 # Common header and source files
 cp -r npm/linux-x64/{include,versions.json,THIRD-PARTY-NOTICES.md} npm/dev/
+cp -r npm/win32-x64/include npm/dev/
 find npm/dev/include/ -maxdepth 1 -type f -links +1 -delete
 for source in VConnection VError VImage VInterpolate VRegion vips-operators; do
   download_cpp "$source"

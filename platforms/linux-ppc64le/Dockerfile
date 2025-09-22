@@ -1,7 +1,7 @@
 FROM debian:bookworm
 LABEL maintainer="Lovell Fuller <npm@lovell.info>"
 
-# Create Debian 12 (glibc 2.36) container suitable for cross-compiling Linux s390x binaries
+# Create Debian 12 (glibc 2.36) container suitable for cross-compiling Linux ppc64le binaries
 
 # Path settings
 ENV \
@@ -13,13 +13,13 @@ ENV \
 RUN \
   apt-get update && \
   apt-get install -y curl && \
-  dpkg --add-architecture s390x && \
+  dpkg --add-architecture ppc64el && \
   apt-get update && \
   apt-get install -y \
     autoconf \
     autopoint \
     cmake \
-    crossbuild-essential-s390x \
+    crossbuild-essential-ppc64el \
     gettext \
     git \
     gperf \
@@ -29,12 +29,12 @@ RUN \
     ninja-build \
     pipx \
     pkgconf \
-    pkgconf:s390x \
+    pkgconf:ppc64el \
     && \
   curl https://sh.rustup.rs -sSf | sh -s -- -y \
     --no-modify-path \
     --profile minimal \
-    --target s390x-unknown-linux-gnu \
+    --target powerpc64le-unknown-linux-gnu \
     --default-toolchain nightly \
     && \
   cargo install cargo-c --locked && \
@@ -42,20 +42,16 @@ RUN \
 
 # Handy for debugging the compiled targets in Highway (hwy_list_targets)
 #RUN apt-get install -y qemu-user-static
-#ENV QEMU_LD_PREFIX="/usr/s390x-linux-gnu"
+#ENV QEMU_LD_PREFIX="/usr/powerpc64le-linux-gnu"
 
 # Compiler settings
 ENV \
-  PKG_CONFIG="s390x-linux-gnu-pkg-config --static" \
-  PLATFORM="linux-s390x" \
-  CHOST="s390x-linux-gnu" \
-  RUST_TARGET="s390x-unknown-linux-gnu" \
+  PKG_CONFIG="powerpc64le-linux-gnu-pkg-config --static" \
+  PLATFORM="linux-ppc64le" \
+  CHOST="powerpc64le-linux-gnu" \
+  RUST_TARGET="powerpc64le-unknown-linux-gnu" \
   FLAGS="" \
   RUSTFLAGS="-Zlocation-detail=none -Zfmt-debug=none" \
-  # Highway requires IBM z14, which isn't the baseline in
-  # Debian yet. Therefore, it should remain disabled for now.
-  #FLAGS="-march=z14 -mzvector" \
-  WITHOUT_HIGHWAY="true" \
   MESON="--cross-file=/root/meson.ini"
 
 COPY Toolchain.cmake /root/

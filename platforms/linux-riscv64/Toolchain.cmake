@@ -1,12 +1,12 @@
 set(CMAKE_SYSTEM_NAME Linux)
 set(CMAKE_SYSTEM_VERSION 1)
-set(CMAKE_SYSTEM_PROCESSOR armv6-a)
+set(CMAKE_SYSTEM_PROCESSOR riscv64)
 
-SET(CMAKE_C_COMPILER arm-rpi-linux-gnueabihf-gcc)
-set(CMAKE_CXX_COMPILER arm-rpi-linux-gnueabihf-g++)
-SET(CMAKE_AR arm-rpi-linux-gnueabihf-ar)
-SET(CMAKE_STRIP arm-rpi-linux-gnueabihf-strip)
-SET(CMAKE_RANLIB arm-rpi-linux-gnueabihf-ranlib)
+SET(CMAKE_C_COMPILER riscv64-linux-gnu-gcc)
+SET(CMAKE_CXX_COMPILER riscv64-linux-gnu-g++)
+SET(CMAKE_AR riscv64-linux-gnu-gcc-ar)
+SET(CMAKE_STRIP riscv64-linux-gnu-gcc-strip)
+SET(CMAKE_RANLIB riscv64-linux-gnu-gcc-ranlib)
 
 set(CMAKE_FIND_ROOT_PATH $ENV{TARGET_SYSROOT})
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)

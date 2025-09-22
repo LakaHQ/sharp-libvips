@@ -9,6 +9,11 @@ ENV \
   CARGO_HOME="/usr/local/cargo" \
   PATH="/usr/local/cargo/bin:$PATH"
 
+# Musl defaults to static libs but we need them to be dynamic for host toolchain.
+# The toolchain will produce static libs by default.
+ENV \
+  RUSTFLAGS="-Ctarget-feature=-crt-static"
+
 # Build dependencies
 RUN \
   apk update && apk upgrade && \
@@ -28,15 +33,17 @@ RUN \
     linux-headers \
     nasm \
     ninja \
+    openssl-dev \
     pkgconf \
-    py3-packaging \
     py3-pip \
     python3 \
     && \
   curl https://sh.rustup.rs -sSf | sh -s -- -y \
     --no-modify-path \
     --profile minimal \
+    --default-toolchain nightly \
     && \
+  cargo install cargo-c --locked && \
   pip3 install meson
 
 # Compiler settings
@@ -44,12 +51,8 @@ ENV \
   PKG_CONFIG="pkg-config --static" \
   PLATFORM="linuxmusl-x64" \
   FLAGS="-march=nehalem" \
+  RUSTFLAGS="-Zlocation-detail=none -Zfmt-debug=none" \
   MESON="--cross-file=/root/meson.ini"
-
-# Musl defaults to static libs but we need them to be dynamic for host toolchain.
-# The toolchain will produce static libs by default.
-ENV \
-  RUSTFLAGS="-Ctarget-feature=-crt-static"
 
 COPY Toolchain.cmake /root/
 COPY meson.ini /root/
