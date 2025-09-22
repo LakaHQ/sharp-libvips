@@ -17,22 +17,22 @@ without_prerelease() {
 
 # Environment / working directories
 case ${PLATFORM} in
-linux*)
-  LINUX=true
-  DEPS=/deps
-  TARGET=/target
-  PACKAGE=/packaging
-  ROOT=/root
-  VIPS_CPP_DEP=libvips-cpp.so.$(without_prerelease $VERSION_VIPS)
-  ;;
-darwin*)
-  DARWIN=true
-  DEPS=$PWD/deps
-  TARGET=$PWD/target
-  PACKAGE=$PWD
-  ROOT=$PWD/platforms/$PLATFORM
-  VIPS_CPP_DEP=libvips-cpp.$(without_prerelease $VERSION_VIPS).dylib
-  ;;
+  linux*)
+    LINUX=true
+    DEPS=/deps
+    TARGET=/target
+    PACKAGE=/packaging
+    ROOT=/root
+    VIPS_CPP_DEP=libvips-cpp.so.$(without_prerelease $VERSION_VIPS)
+    ;;
+  darwin*)
+    DARWIN=true
+    DEPS=$PWD/deps
+    TARGET=$PWD/target
+    PACKAGE=$PWD
+    ROOT=$PWD/platforms/$PLATFORM
+    VIPS_CPP_DEP=libvips-cpp.$(without_prerelease $VERSION_VIPS).dylib
+    ;;
 esac
 
 mkdir -p ${DEPS}
@@ -109,10 +109,10 @@ CURL="curl --silent --location --retry 3 --retry-max-time 30"
 # Download and build dependencies from source
 
 if [ "$DARWIN" = true ]; then
-  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs |
-    sh -s -- -y --no-modify-path --profile minimal--default-toolchain nightly
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
+    | sh -s -- -y --no-modify-path --profile minimal--default-toolchain nightly
   export RUSTFLAGS+=" -Zlocation-detail=none -Zfmt-debug=none"
-    CFLAGS= cargo install cargo-c --locked
+  CFLAGS= cargo install cargo-c --locked
 fi
 
 if [ "${PLATFORM%-*}" == "linuxmusl" ] || [ "$DARWIN" = true ]; then
@@ -267,7 +267,7 @@ if [ -z "$WITHOUT_HIGHWAY" ]; then
 
   echo "Patching highway ${VERSION_HWY}..."
   $CURL https://github.com/google/highway/commit/ad48f2bf298bac247288c8399a5c0e9a40ed8246.patch | patch -p1
-    CFLAGS="${CFLAGS} -O3" CXXFLAGS="${CXXFLAGS} -O3" cmake -G"Unix Makefiles" \
+  CFLAGS="${CFLAGS} -O3" CXXFLAGS="${CXXFLAGS} -O3" cmake -G"Unix Makefiles" \
     -DCMAKE_TOOLCHAIN_FILE=${ROOT}/Toolchain.cmake -DCMAKE_INSTALL_PREFIX=${TARGET} -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_BUILD_TYPE=Release \
     -DBUILD_SHARED_LIBS=FALSE -DBUILD_TESTING=0 -DHWY_ENABLE_CONTRIB=0 -DHWY_ENABLE_EXAMPLES=0 -DHWY_ENABLE_TESTS=0
   make install/strip
@@ -407,7 +407,7 @@ if [ "$LINUX" = true ]; then
   EXCLUDE_LIBS=${EXCLUDE_LIBS%?}
   # Localize the g_param_spec_types symbol to avoid collisions with shared libraries
   # See: https://github.com/lovell/sharp/issues/2535#issuecomment-766400693
-  printf "{local:g_param_spec_types;};" >vips.map
+  printf "{local:g_param_spec_types;};" > vips.map
 fi
 # Disable building man pages, gettext po files, tools, and (fuzz-)tests
 sed -i'.bak' "/subdir('man')/{N;N;N;N;d;}" meson.build
@@ -457,7 +457,7 @@ function copydeps {
       # Call this function (recursive) on each dependency of this library
       copydeps $base_dep $dest_dir
     fi
-  done
+  done;
 }
 
 cd ${TARGET}/lib
