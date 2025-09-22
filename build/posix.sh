@@ -95,7 +95,7 @@ export CARGO_PROFILE_RELEASE_INCREMENTAL=false
 export CARGO_PROFILE_RELEASE_LTO=true
 export CARGO_PROFILE_RELEASE_OPT_LEVEL=z
 export CARGO_PROFILE_RELEASE_PANIC=abort
-export CARGO_REGISTRIES_CRATES_IO_PROTOCOL=sparse
+#export CARGO_REGISTRIES_CRATES_IO_PROTOCOL=sparse
 # Ensure Cargo build path prefixes are removed from the resulting binaries
 # https://reproducible-builds.org/docs/build-path/
 export RUSTFLAGS+=" --remap-path-prefix=$CARGO_HOME/registry/="
@@ -110,7 +110,7 @@ CURL="curl --silent --location --retry 3 --retry-max-time 30"
 
 if [ "$DARWIN" = true ]; then
   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
-    | sh -s -- -y --no-modify-path --profile minimal--default-toolchain nightly
+    | sh -s -- -y --no-modify-path --profile minimal --default-toolchain nightly
   export RUSTFLAGS+=" -Zlocation-detail=none -Zfmt-debug=none"
   CFLAGS= cargo install cargo-c --locked
 fi
